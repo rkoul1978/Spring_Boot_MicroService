@@ -11,6 +11,24 @@ spring:
       # username: admin
       # password: password
 
+  # Redis Configuration for Caching
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 60000ms
+    password: # Leave empty if no authentication required
+    database: 0
+    # Lettuce connection pool settings
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        shutdown-timeout: 100ms
+    cache:
+      ttl: 3600  # Cache TTL in seconds (1 hour)
+      null-ttl: 300  # TTL for null values (5 minutes)
+
   # Kafka Configuration
   kafka:
     bootstrap-servers: localhost:9092
@@ -56,5 +74,7 @@ logging:
     com.microservice: DEBUG
     org.apache.kafka: WARN
     org.springframework.kafka: INFO
+    org.springframework.cache: DEBUG
+    org.springframework.data.redis: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

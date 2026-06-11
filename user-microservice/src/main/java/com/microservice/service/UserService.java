@@ -6,6 +6,8 @@ import com.microservice.model.User;
 import com.microservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +22,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final KafkaUserEventProducer kafkaUserEventProducer;
 
+    /**
+     * Create a new user and publish CREATED event
+     * Evicts all related caches
+     */
+    @CacheEvict(value = {"users", "activeUsers"}, allEntries = true)
     public UserDTO createUser(UserDTO userDTO) {
         log.info("Creating user with email: {}", userDTO.getEmail());
         User user = User.builder()
@@ -47,6 +54,10 @@ public class UserService {
         return createdUserDTO;
     }
 
+    /**
+     * Get user by ID with caching
+     */
+    @Cacheable(value = "userById", key = "#id")
     public UserDTO getUserById(String id) {
         log.info("Fetching user with ID: {}", id);
         return userRepository.findById(id)
@@ -57,6 +68,10 @@ public class UserService {
                 });
     }
 
+    /**
+     * Get user by email with caching
+     */
+    @Cacheable(value = "userByEmail", key = "#email")
     public UserDTO getUserByEmail(String email) {
         log.info("Fetching user with email: {}", email);
         return userRepository.findByEmail(email)
@@ -67,6 +82,10 @@ public class UserService {
                 });
     }
 
+    /**
+     * Get all users with caching
+     */
+    @Cacheable(value = "users")
     public List<UserDTO> getAllUsers() {
         log.info("Fetching all users");
         return userRepository.findAll()
@@ -75,6 +94,10 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get users by city with caching
+     */
+    @Cacheable(value = "usersByCity", key = "#city")
     public List<UserDTO> getUsersByCity(String city) {
         log.info("Fetching users from city: {}", city);
         return userRepository.findByCity(city)
@@ -83,6 +106,10 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get active users with caching
+     */
+    @Cacheable(value = "activeUsers")
     public List<UserDTO> getActiveUsers() {
         log.info("Fetching all active users");
         return userRepository.findByActive(true)
@@ -91,6 +118,10 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get users by name with caching
+     */
+    @Cacheable(value = "usersByName", key = "#firstName + '_' + #lastName")
     public List<UserDTO> getUsersByName(String firstName, String lastName) {
         log.info("Fetching users with name: {} {}", firstName, lastName);
         return userRepository.findByFirstNameAndLastName(firstName, lastName)
@@ -99,6 +130,12 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Update user and publish UPDATED event
+     * Evicts related caches for the updated user
+     */
+    @CacheEvict(value = {"users", "userById", "userByEmail", "usersByCity", "activeUsers", "usersByName"}, 
+                allEntries = true)
     public UserDTO updateUser(String id, UserDTO userDTO) {
         log.info("Updating user with ID: {}", id);
         User user = userRepository.findById(id)
@@ -125,6 +162,12 @@ public class UserService {
         return updatedUserDTO;
     }
 
+    /**
+     * Delete user and publish DELETED event
+     * Evicts all related caches
+     */
+    @CacheEvict(value = {"users", "userById", "userByEmail", "usersByCity", "activeUsers", "usersByName"}, 
+                allEntries = true)
     public void deleteUser(String id) {
         log.info("Deleting user with ID: {}", id);
         User user = userRepository.findById(id)
@@ -138,6 +181,12 @@ public class UserService {
         log.info("User deleted successfully with ID: {}", id);
     }
 
+    /**
+     * Deactivate user and publish DEACTIVATED event
+     * Evicts all related caches
+     */
+    @CacheEvict(value = {"users", "userById", "userByEmail", "usersByCity", "activeUsers", "usersByName"}, 
+                allEntries = true)
     public void deactivateUser(String id) {
         log.info("Deactivating user with ID: {}", id);
         User user = userRepository.findById(id)

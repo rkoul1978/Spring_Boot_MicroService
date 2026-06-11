@@ -92,12 +92,43 @@ services:
     networks:
       - user-microservice-network
 
+  redis:
+    image: redis:7-alpine
+    container_name: user-microservice-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass "" --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - user-microservice-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: user-microservice-redis-commander
+    restart: always
+    depends_on:
+      - redis
+    ports:
+      - "8082:8081"
+    environment:
+      REDIS_HOSTS: local:redis:6379:0:
+    networks:
+      - user-microservice-network
+
 volumes:
   mongodb_data:
   mongodb_config:
   zookeeper_data:
   zookeeper_logs:
   kafka_data:
+  redis_data:
 
 networks:
   user-microservice-network:
