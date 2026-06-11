@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: user-microservice
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/user_db
+      # Alternative configuration (uncomment to use):
+      # host: localhost
+      # port: 27017
+      # database: user_db
+      # username: admin
+      # password: password
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+logging:
+  level:
+    root: INFO
+    com.microservice: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

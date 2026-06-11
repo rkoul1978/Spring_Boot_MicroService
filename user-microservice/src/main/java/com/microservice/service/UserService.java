@@ -1,0 +1,154 @@
+package com.microservice.service;
+
+import com.microservice.dto.UserDTO;
+import com.microservice.model.User;
+import com.microservice.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class UserService {
+
+    private final UserRepository userRepository;
+
+    public UserDTO createUser(UserDTO userDTO) {
+        log.info("Creating user with email: {}", userDTO.getEmail());
+        User user = User.builder()
+                .firstName(userDTO.getFirstName())
+                .lastName(userDTO.getLastName())
+                .email(userDTO.getEmail())
+                .phoneNumber(userDTO.getPhoneNumber())
+                .address(userDTO.getAddress())
+                .city(userDTO.getCity())
+                .state(userDTO.getState())
+                .zipCode(userDTO.getZipCode())
+                .country(userDTO.getCountry())
+                .active(true)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        User savedUser = userRepository.save(user);
+        log.info("User created successfully with ID: {}", savedUser.getId());
+        return convertToDTO(savedUser);
+    }
+
+    public UserDTO getUserById(String id) {
+        log.info("Fetching user with ID: {}", id);
+        return userRepository.findById(id)
+                .map(this::convertToDTO)
+                .orElseThrow(() -> {
+                    log.error("User not found with ID: {}", id);
+                    return new RuntimeException("User not found with ID: " + id);
+                });
+    }
+
+    public UserDTO getUserByEmail(String email) {
+        log.info("Fetching user with email: {}", email);
+        return userRepository.findByEmail(email)
+                .map(this::convertToDTO)
+                .orElseThrow(() -> {
+                    log.error("User not found with email: {}", email);
+                    return new RuntimeException("User not found with email: " + email);
+                });
+    }
+
+    public List<UserDTO> getAllUsers() {
+        log.info("Fetching all users");
+        return userRepository.findAll()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDTO> getUsersByCity(String city) {
+        log.info("Fetching users from city: {}", city);
+        return userRepository.findByCity(city)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDTO> getActiveUsers() {
+        log.info("Fetching all active users");
+        return userRepository.findByActive(true)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDTO> getUsersByName(String firstName, String lastName) {
+        log.info("Fetching users with name: {} {}", firstName, lastName);
+        return userRepository.findByFirstNameAndLastName(firstName, lastName)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public UserDTO updateUser(String id, UserDTO userDTO) {
+        log.info("Updating user with ID: {}", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setEmail(userDTO.getEmail());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setAddress(userDTO.getAddress());
+        user.setCity(userDTO.getCity());
+        user.setState(userDTO.getState());
+        user.setZipCode(userDTO.getZipCode());
+        user.setCountry(userDTO.getCountry());
+        user.setUpdatedAt(LocalDateTime.now());
+
+        User updatedUser = userRepository.save(user);
+        log.info("User updated successfully with ID: {}", id);
+        return convertToDTO(updatedUser);
+    }
+
+    public void deleteUser(String id) {
+        log.info("Deleting user with ID: {}", id);
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found with ID: " + id);
+        }
+        userRepository.deleteById(id);
+        log.info("User deleted successfully with ID: {}", id);
+    }
+
+    public void deactivateUser(String id) {
+        log.info("Deactivating user with ID: {}", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+
+        user.setActive(false);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        log.info("User deactivated successfully with ID: {}", id);
+    }
+
+    private UserDTO convertToDTO(User user) {
+        return UserDTO.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .address(user.getAddress())
+                .city(user.getCity())
+                .state(user.getState())
+                .zipCode(user.getZipCode())
+                .country(user.getCountry())
+                .active(user.isActive())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
+    }
+
+}
