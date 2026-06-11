@@ -1,6 +1,7 @@
 package com.microservice.service;
 
 import com.microservice.dto.UserDTO;
+import com.microservice.kafka.KafkaUserEventProducer;
 import com.microservice.model.User;
 import com.microservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final KafkaUserEventProducer kafkaUserEventProducer;
 
     public UserDTO createUser(UserDTO userDTO) {
         log.info("Creating user with email: {}", userDTO.getEmail());
@@ -36,8 +38,13 @@ public class UserService {
                 .build();
 
         User savedUser = userRepository.save(user);
+        UserDTO createdUserDTO = convertToDTO(savedUser);
+        
+        // Publish user created event to Kafka
+        kafkaUserEventProducer.publishUserCreatedEvent(createdUserDTO);
+        
         log.info("User created successfully with ID: {}", savedUser.getId());
-        return convertToDTO(savedUser);
+        return createdUserDTO;
     }
 
     public UserDTO getUserById(String id) {
@@ -109,16 +116,25 @@ public class UserService {
         user.setUpdatedAt(LocalDateTime.now());
 
         User updatedUser = userRepository.save(user);
+        UserDTO updatedUserDTO = convertToDTO(updatedUser);
+        
+        // Publish user updated event to Kafka
+        kafkaUserEventProducer.publishUserUpdatedEvent(updatedUserDTO);
+        
         log.info("User updated successfully with ID: {}", id);
-        return convertToDTO(updatedUser);
+        return updatedUserDTO;
     }
 
     public void deleteUser(String id) {
         log.info("Deleting user with ID: {}", id);
-        if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found with ID: " + id);
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+        
         userRepository.deleteById(id);
+        
+        // Publish user deleted event to Kafka
+        kafkaUserEventProducer.publishUserDeletedEvent(convertToDTO(user));
+        
         log.info("User deleted successfully with ID: {}", id);
     }
 
@@ -129,7 +145,11 @@ public class UserService {
 
         user.setActive(false);
         user.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(user);
+        User deactivatedUser = userRepository.save(user);
+        
+        // Publish user deactivated event to Kafka
+        kafkaUserEventProducer.publishUserDeactivatedEvent(convertToDTO(deactivatedUser));
+        
         log.info("User deactivated successfully with ID: {}", id);
     }
 

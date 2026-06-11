@@ -1,6 +1,6 @@
 # Spring Boot User Microservice
 
-A production-ready Spring Boot microservice with complete RESTful API endpoints and MongoDB integration.
+A production-ready Spring Boot microservice with complete RESTful API endpoints, MongoDB integration, and Apache Kafka event streaming.
 
 ## Quick Start
 
@@ -24,29 +24,43 @@ chmod +x setup.sh
 
 ### Manual Setup
 
-1. **Start MongoDB**
+1. **Start MongoDB and Kafka**
 ```bash
 docker-compose up -d
 ```
 
-2. **Build the Project**
+2. **Create Kafka Topics** (Optional - auto-created)
+```bash
+# Windows
+kafka-setup.bat
+
+# Linux/Mac
+chmod +x kafka-setup.sh
+./kafka-setup.sh
+```
+
+3. **Build the Project**
 ```bash
 mvn clean install
 ```
 
-3. **Run the Application**
+4. **Run the Application**
 ```bash
 mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=dev"
 ```
 
-4. **Access the Application**
+5. **Access the Application**
 - API: http://localhost:8080/api/v1/users
 - MongoDB UI: http://localhost:8081 (admin/password)
+- Kafka UI: http://localhost:8080
+- Kafka Bootstrap: localhost:9092
 
 ## Features
 
 ✅ Complete RESTful CRUD APIs  
 ✅ MongoDB Integration with Spring Data  
+✅ Apache Kafka Event Streaming  
+✅ Event-Driven Architecture  
 ✅ Comprehensive Error Handling  
 ✅ Logging & Monitoring  
 ✅ Docker Support  
@@ -67,6 +81,38 @@ mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=dev"
 | PATCH | `/v1/users/{id}/deactivate` | Deactivate user |
 | DELETE | `/v1/users/{id}` | Delete user |
 
+## Kafka Event Streaming
+
+This microservice publishes events to Apache Kafka for the following operations:
+
+- **CREATED**: When a new user is created
+- **UPDATED**: When user information is modified
+- **DELETED**: When a user is removed
+- **DEACTIVATED**: When a user account is disabled
+
+### Event Flow
+
+```
+Create/Update/Delete User → Kafka Topic (user-events) → Other Services/Consumers
+```
+
+### Monitoring Kafka Events
+
+**Using Kafka UI**
+- Open: http://localhost:8080
+- Navigate to Topics → user-events
+- View messages in real-time
+
+**Using Command Line**
+```bash
+docker exec -it user-microservice-kafka kafka-console-consumer \
+  --bootstrap-server localhost:9092 \
+  --topic user-events \
+  --from-beginning
+```
+
+For complete Kafka documentation, see [KAFKA_INTEGRATION.md](KAFKA_INTEGRATION.md)
+
 ## Project Structure
 
 ```
@@ -77,13 +123,17 @@ user-microservice/
 │   ├── repository/          # Data access
 │   ├── model/               # Entities
 │   ├── dto/                 # Data Transfer Objects
-│   ├── config/              # Configuration
+│   ├── event/               # Event DTOs
+│   ├── kafka/               # Kafka producers/consumers
+│   ├── config/              # Configuration (Kafka, MongoDB)
 │   └── exception/           # Exception handling
 ├── src/main/resources/      # Configuration files
 ├── src/test/                # Tests
 ├── pom.xml                  # Maven dependencies
-├── docker-compose.yml       # Docker setup
-└── README.md                # Documentation
+├── docker-compose.yml       # Docker setup (MongoDB, Kafka, Zookeeper)
+├── kafka-setup.sh/bat       # Kafka configuration script
+├── KAFKA_INTEGRATION.md     # Kafka integration guide
+└── README.md                # Detailed documentation
 ```
 
 ## Technologies
@@ -91,6 +141,7 @@ user-microservice/
 - **Language**: Java 17
 - **Framework**: Spring Boot 3.1.5
 - **Database**: MongoDB
+- **Messaging**: Apache Kafka
 - **Build**: Maven
 - **Tools**: Docker, Lombok
 

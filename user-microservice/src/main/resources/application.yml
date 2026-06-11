@@ -11,6 +11,40 @@ spring:
       # username: admin
       # password: password
 
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: localhost:9092
+    
+    # Producer Configuration
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      batch-size: 16384
+      linger-ms: 10
+      buffer-memory: 33554432
+      # Optional: add other producer properties
+      # compression-type: snappy
+      # request-timeout-ms: 30000
+    
+    # Consumer Configuration
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: user-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      max-poll-records: 100
+      session-timeout-ms: 30000
+      # Optional: add other consumer properties
+      # heartbeat-interval-ms: 10000
+      # max-poll-interval-ms: 300000
+    
+    # Topics
+    topics:
+      user-events: user-events
+
 server:
   port: 8080
   servlet:
@@ -20,5 +54,7 @@ logging:
   level:
     root: INFO
     com.microservice: DEBUG
+    org.apache.kafka: WARN
+    org.springframework.kafka: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

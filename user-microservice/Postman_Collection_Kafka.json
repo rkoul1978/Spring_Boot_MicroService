@@ -1,0 +1,245 @@
+{
+	"info": {
+		"name": "User Microservice - Kafka Integration",
+		"description": "Collection for testing User Microservice with Kafka event integration",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "v1", "users"]
+				},
+				"description": "Health check - Get all users"
+			},
+			"response": []
+		},
+		{
+			"name": "Create User - Triggers CREATED Event",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phoneNumber\": \"+1-555-123-4567\",\n  \"address\": \"123 Main Street\",\n  \"city\": \"New York\",\n  \"state\": \"NY\",\n  \"zipCode\": \"10001\",\n  \"country\": \"USA\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "v1", "users"]
+				},
+				"description": "Create a new user. This will publish a CREATED event to Kafka topic 'user-events'"
+			},
+			"response": []
+		},
+		{
+			"name": "Create User - Jane Smith",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"email\": \"jane.smith@example.com\",\n  \"phoneNumber\": \"+1-555-987-6543\",\n  \"address\": \"456 Oak Avenue\",\n  \"city\": \"Boston\",\n  \"state\": \"MA\",\n  \"zipCode\": \"02101\",\n  \"country\": \"USA\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "v1", "users"]
+				},
+				"description": "Create another user for testing"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "v1", "users"]
+				},
+				"description": "Retrieve all users"
+			},
+			"response": []
+		},
+		{
+			"name": "Get User by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/{{user_id}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "v1", "users", "{{user_id}}"]
+				},
+				"description": "Get a specific user by ID. Replace {{user_id}} with actual user ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Get User by Email",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/email/john.doe@example.com",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "v1", "users", "email", "john.doe@example.com"]
+				},
+				"description": "Get user by email address"
+			},
+			"response": []
+		},
+		{
+			"name": "Update User - Triggers UPDATED Event",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"email\": \"john.smith@example.com\",\n  \"phoneNumber\": \"+1-555-111-2222\",\n  \"address\": \"789 Pine Road\",\n  \"city\": \"Los Angeles\",\n  \"state\": \"CA\",\n  \"zipCode\": \"90001\",\n  \"country\": \"USA\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/{{user_id}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "v1", "users", "{{user_id}}"]
+				},
+				"description": "Update user information. This will publish an UPDATED event to Kafka topic 'user-events'. Replace {{user_id}} with actual user ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Deactivate User - Triggers DEACTIVATED Event",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/{{user_id}}/deactivate",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "v1", "users", "{{user_id}}", "deactivate"]
+				},
+				"description": "Deactivate a user. This will publish a DEACTIVATED event to Kafka topic 'user-events'. Replace {{user_id}} with actual user ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete User - Triggers DELETED Event",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/{{user_id}}",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "v1", "users", "{{user_id}}"]
+				},
+				"description": "Delete a user. This will publish a DELETED event to Kafka topic 'user-events'. Replace {{user_id}} with actual user ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Users by City",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/city/New York",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "v1", "users", "city", "New York"]
+				},
+				"description": "Get all users from a specific city"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Active Users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/active",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "v1", "users", "active"]
+				},
+				"description": "Get all active users"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Users by Name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/search?firstName=John&lastName=Doe",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "v1", "users", "search"],
+					"query": [
+						{
+							"key": "firstName",
+							"value": "John"
+						},
+						{
+							"key": "lastName",
+							"value": "Doe"
+						}
+					]
+				},
+				"description": "Search users by first and last name"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "user_id",
+			"value": "replace_with_actual_user_id",
+			"type": "string"
+		}
+	]
+}
