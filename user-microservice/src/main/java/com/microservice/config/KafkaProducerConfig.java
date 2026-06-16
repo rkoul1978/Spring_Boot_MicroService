@@ -1,6 +1,5 @@
 package com.microservice.config;
 
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.microservice.event.UserEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;

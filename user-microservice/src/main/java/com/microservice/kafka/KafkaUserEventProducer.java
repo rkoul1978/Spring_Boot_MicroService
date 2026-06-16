@@ -97,7 +97,7 @@ public class KafkaUserEventProducer {
             Message<UserEvent> message = MessageBuilder
                     .withPayload(event)
                     .setHeader(KafkaHeaders.TOPIC, userEventsTopic)
-                    .setHeader(KafkaHeaders.MESSAGE_KEY, event.getUserId())
+                    .setHeader(KafkaHeaders.KEY, event.getUserId())
                     .setHeader("eventType", event.getEventType())
                     .build();
 

@@ -6,7 +6,7 @@ spring:
       uri: mongodb://admin:password@localhost:27017/user_db?authSource=admin
 
 server:
-  port: 8080
+  port: 8090
   servlet:
     context-path: /api
 

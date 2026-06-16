@@ -50,7 +50,7 @@ mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=dev"
 ```
 
 5. **Access the Application**
-- API: http://localhost:8080/api/v1/users
+- API: http://localhost:8090/api/v1/users
 - MongoDB UI: http://localhost:8081 (admin/password)
 - Kafka UI: http://localhost:8080
 - Redis UI: http://localhost:8082
@@ -112,10 +112,10 @@ Subsequent Requests (Cache Hit) → Redis Cache → Result → ~5-10ms
 
 ```bash
 # First request (slow - cache miss)
-curl -w "\nTime: %{time_total}s\n" http://localhost:8080/api/v1/users
+curl -w "\nTime: %{time_total}s\n" http://localhost:8090/api/v1/users
 
 # Second request (fast - cache hit)
-curl -w "\nTime: %{time_total}s\n" http://localhost:8080/api/v1/users
+curl -w "\nTime: %{time_total}s\n" http://localhost:8090/api/v1/users
 
 # Expected: 10-100x faster!
 ```
@@ -194,7 +194,7 @@ user-microservice/
 ## Sample Request
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/users \
+curl -X POST http://localhost:8090/api/v1/users \
   -H "Content-Type: application/json" \
   -d '{
     "firstName": "John",
