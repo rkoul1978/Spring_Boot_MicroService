@@ -3,7 +3,7 @@ spring:
     name: user-microservice
   data:
     mongodb:
-      uri: mongodb://localhost:27017/user_db
+      uri: mongodb://admin:password@localhost:27017/user_db?authSource=admin
       # Alternative configuration (uncomment to use):
       # host: localhost
       # port: 27017
@@ -67,6 +67,10 @@ server:
   port: 8090
   servlet:
     context-path: /api
+
+user-details:
+  service:
+    url: http://localhost:8095
 
 logging:
   level:

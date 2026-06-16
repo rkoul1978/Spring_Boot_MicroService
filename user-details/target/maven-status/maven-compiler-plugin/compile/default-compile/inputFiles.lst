@@ -1,0 +1,7 @@
+C:\Spring_Boot_MicroService\user-details\src\main\java\com\userdetails\model\UserDetails.java
+C:\Spring_Boot_MicroService\user-details\src\main\java\com\userdetails\controller\UserDetailsController.java
+C:\Spring_Boot_MicroService\user-details\src\main\java\com\userdetails\exception\GlobalExceptionHandler.java
+C:\Spring_Boot_MicroService\user-details\src\main\java\com\userdetails\service\UserDetailsService.java
+C:\Spring_Boot_MicroService\user-details\src\main\java\com\userdetails\repository\UserDetailsRepository.java
+C:\Spring_Boot_MicroService\user-details\src\main\java\com\userdetails\UserDetailsApplication.java
+C:\Spring_Boot_MicroService\user-details\src\main\java\com\userdetails\dto\UserDetailsRequest.java
