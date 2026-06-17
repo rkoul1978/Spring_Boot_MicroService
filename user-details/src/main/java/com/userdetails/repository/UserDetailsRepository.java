@@ -15,4 +15,6 @@ public interface UserDetailsRepository extends MongoRepository<UserDetails, Stri
     Optional<UserDetails> findByUserId(String userId);
 
     boolean existsByUserId(String userId);
+
+    boolean existsByAccountNumber(String accountNumber);
 }

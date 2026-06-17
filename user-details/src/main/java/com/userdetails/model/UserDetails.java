@@ -26,6 +26,9 @@ public class UserDetails {
     @Indexed(unique = true)
     private String userId;
 
+    @Indexed(unique = true)
+    private String accountNumber;
+
     private String email;
     private String firstName;
     private String lastName;

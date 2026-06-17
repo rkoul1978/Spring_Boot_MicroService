@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
 /**
@@ -16,6 +17,11 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Slf4j
 public class UserDetailsService {
+
+    private static final int ACCOUNT_NUMBER_LENGTH = 12;
+    private static final int MAX_ACCOUNT_GENERATION_ATTEMPTS = 5;
+
+    private final SecureRandom random = new SecureRandom();
 
     private final UserDetailsRepository repository;
 
@@ -37,6 +43,7 @@ public class UserDetailsService {
         LocalDateTime now = LocalDateTime.now();
         return UserDetails.builder()
                 .userId(request.getUserId())
+                .accountNumber(generateUniqueAccountNumber())
                 .email(request.getEmail())
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
@@ -63,5 +70,31 @@ public class UserDetailsService {
         existing.setCountry(request.getCountry());
         existing.setUpdatedAt(LocalDateTime.now());
         return existing;
+    }
+
+    /**
+     * Generate a random numeric account number that is not already used by another
+     * record. Retries a few times in the unlikely event of a collision.
+     */
+    private String generateUniqueAccountNumber() {
+        for (int attempt = 0; attempt < MAX_ACCOUNT_GENERATION_ATTEMPTS; attempt++) {
+            String candidate = randomAccountNumber();
+            if (!repository.existsByAccountNumber(candidate)) {
+                return candidate;
+            }
+            log.warn("Generated account number {} already exists, retrying", candidate);
+        }
+        throw new IllegalStateException("Unable to generate a unique account number after "
+                + MAX_ACCOUNT_GENERATION_ATTEMPTS + " attempts");
+    }
+
+    private String randomAccountNumber() {
+        StringBuilder sb = new StringBuilder(ACCOUNT_NUMBER_LENGTH);
+        // First digit is 1-9 to keep a fixed length account number.
+        sb.append(random.nextInt(9) + 1);
+        for (int i = 1; i < ACCOUNT_NUMBER_LENGTH; i++) {
+            sb.append(random.nextInt(10));
+        }
+        return sb.toString();
     }
 }
