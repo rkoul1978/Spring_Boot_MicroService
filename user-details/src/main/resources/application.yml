@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: user-details
+  data:
+    mongodb:
+      uri: mongodb://admin:password@localhost:27017/user_details_db?authSource=admin
+
+server:
+  port: 8095
+
+logging:
+  level:
+    root: INFO
+    com.userdetails: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

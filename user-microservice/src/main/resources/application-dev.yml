@@ -10,6 +10,10 @@ server:
   servlet:
     context-path: /api
 
+user-details:
+  service:
+    url: http://localhost:8095
+
 logging:
   level:
     root: INFO

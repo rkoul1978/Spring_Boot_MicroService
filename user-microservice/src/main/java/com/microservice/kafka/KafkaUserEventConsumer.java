@@ -1,6 +1,8 @@
 package com.microservice.kafka;
 
+import com.microservice.client.UserDetailsClient;
 import com.microservice.event.UserEvent;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -14,8 +16,11 @@ import org.springframework.stereotype.Service;
  * This is an example consumer that can be extended for specific business logic
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class KafkaUserEventConsumer {
+
+    private final UserDetailsClient userDetailsClient;
 
     /**
      * Listen to user events from Kafka topic
@@ -69,12 +74,8 @@ public class KafkaUserEventConsumer {
      */
     private void handleUserCreated(UserEvent event) {
         log.info("Processing user creation event for user: {} ({})", event.getUserId(), event.getEmail());
-        // Add business logic here
-        // Examples:
-        // - Send welcome email
-        // - Create user in external system
-        // - Update analytics
-        // - Trigger other microservices
+        // Trigger the user-details microservice to store the new user's details
+        userDetailsClient.sendUserCreated(event);
     }
 
     /**

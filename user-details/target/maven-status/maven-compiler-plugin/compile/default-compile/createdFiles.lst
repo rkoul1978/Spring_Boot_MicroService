@@ -1,0 +1,9 @@
+com\userdetails\UserDetailsApplication.class
+com\userdetails\dto\UserDetailsRequest.class
+com\userdetails\dto\UserDetailsRequest$UserDetailsRequestBuilder.class
+com\userdetails\exception\GlobalExceptionHandler.class
+com\userdetails\controller\UserDetailsController.class
+com\userdetails\service\UserDetailsService.class
+com\userdetails\model\UserDetails$UserDetailsBuilder.class
+com\userdetails\model\UserDetails.class
+com\userdetails\repository\UserDetailsRepository.class
